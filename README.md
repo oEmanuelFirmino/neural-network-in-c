@@ -1,7 +1,6 @@
 # Neural Network from Scratch in C (XOR Problem)
 
 ![Language](https://img.shields.io/badge/Language-C-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)
 
 This project is a comprehensive, academic-level implementation of a feedforward neural network, written entirely in **pure C** with no external machine learning libraries. Its primary goal is to serve as an educational tool, clearly demonstrating the foundational concepts of neural networks from first principles. By building everything from scratch—from memory management to the learning algorithm—this repository provides a deep, practical understanding of **forward propagation**, **backpropagation**, and **gradient descent**. The network is trained to solve the classic XOR problem, a non-linearly separable task that perfectly illustrates the power of multi-layer perceptrons.
@@ -23,7 +22,7 @@ To compile and run this project, you will need a standard C compiler (like GCC o
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/oEmanuelFirmino/neural-network-in-c.git](https://github.com/oEmanuelFirmino/neural-network-in-c.git)
+    git clone https://github.com/oEmanuelFirmino/neural-network-in-c
     ```
 
 2.  **Navigate to the project directory:**
@@ -166,9 +165,3 @@ While this project provides a solid and complete foundation, it could be extende
 - **Modularize and Load Data:** Create functions to load training data, labels, and network topologies from external files (e.g., CSV, JSON). This would decouple the model from the data and make it a more versatile and reusable tool.
 - **Introduce a Makefile:** Add a `Makefile` to automate the compilation process, manage dependencies, and provide clean build/rebuild commands, which is standard practice for larger C projects.
 - **Regularization:** Implement techniques like L1 or L2 regularization to prevent overfitting by adding a penalty term for large weights to the cost function.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
