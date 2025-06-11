@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualizador Interativo de Redes Neurais</title>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, vertically scrolling narrative. The structure follows the logical flow of the source report: Introduction, Architecture, Training Process, and Full Workflow. This linear, guided path is optimal for educational content, turning a static document into an interactive tutorial. Each section is a full-view "slide" with interactive elements to break down complex topics into digestible parts, enhancing user understanding and engagement without overwhelming them. -->
+    <!-- Visualization & Content Choices: 
+        1. Report: Arquitetura da Rede -> Goal: Organize/Inform -> Viz: Interactive diagram (HTML/CSS) -> Interaction: Click on layers to reveal details -> Justification: Allows focused learning on one component at a time.
+        2. Report: Funções de Ativação -> Goal: Compare/Inform -> Viz: Chart.js Line Chart -> Interaction: Buttons to switch between plotting Sigmoid, ReLU, Tanh -> Justification: Visual comparison is more intuitive than formulas alone.
+        3. Report: Processo de Treinamento -> Goal: Explain a process -> Viz: HTML/CSS step-by-step flowchart -> Interaction: Buttons to navigate through the four stages (Forward, Cost, Backprop, Update) -> Justification: Simplifies a complex workflow into a clear, linear sequence.
+        4. Report: Gradiente Descendente -> Goal: Inform -> Viz: Chart.js Line Chart showing a cost function -> Interaction: Button animates a point moving down the curve to the minimum -> Justification: Powerful visual metaphor for an abstract optimization concept.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fa;
+        color: #343a40;
+      }
+      .section-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05),
+          0 4px 6px -2px rgb(0 0 0 / 0.05);
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #e9ecef;
+      }
+      .nav-link {
+        transition: all 0.2s ease-in-out;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: #3498db;
+        background-color: #eaf4fc;
+      }
+      .interactive-btn {
+        transition: all 0.2s ease-in-out;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 400px;
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          height: 350px;
+        }
+      }
+    </style>
+  </head>
+  <body class="flex flex-col md:flex-row">
+    <nav
+      id="navbar"
+      class="w-full md:w-64 bg-white p-4 border-b md:border-r border-gray-200 sticky top-0 md:h-screen z-20"
+    >
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Navegação</h2>
+      <ul class="space-y-2">
+        <li>
+          <a
+            href="#arquitetura"
+            class="nav-link block font-medium text-gray-600 px-4 py-2 rounded-md"
+            >1. Arquitetura</a
+          >
+        </li>
+        <li>
+          <a
+            href="#processo"
+            class="nav-link block font-medium text-gray-600 px-4 py-2 rounded-md"
+            >2. Processo de Treinamento</a
+          >
+        </li>
+        <li>
+          <a
+            href="#fluxo-completo"
+            class="nav-link block font-medium text-gray-600 px-4 py-2 rounded-md"
+            >3. Fluxo Completo</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <main class="flex-1 p-4 md:p-10 space-y-12">
+      <section id="header" class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          Construindo um Modelo de IA: Uma Jornada Interativa
+        </h1>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Esta aplicação transforma os conceitos matemáticos por trás das redes
+          neurais em uma experiência visual. Explore a arquitetura, entenda o
+          processo de treinamento e veja como tudo se conecta.
+        </p>
+      </section>
+
+      <!-- Seção 1: Arquitetura da Rede -->
+      <section id="arquitetura" class="section-card p-6 md:p-8">
+        <h2 class="text-3xl font-bold mb-2">
+          1. A Arquitetura da Rede (A Anatomia)
+        </h2>
+        <p class="text-gray-600 mb-8">
+          Uma rede neural é composta por camadas de neurônios. Clique em cada
+          camada abaixo para explorar sua função e estrutura. Esta organização
+          modular permite que a rede aprenda padrões complexos progressivamente.
+        </p>
+
+        <div
+          class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 md:space-x-4 mb-8"
+        >
+          <!-- Diagrama Interativo -->
+          <div
+            id="layer-input"
+            class="text-center p-4 border-2 border-blue-300 rounded-lg cursor-pointer w-full md:w-1/3 interactive-btn hover:bg-blue-50"
+          >
+            <h3 class="text-xl font-bold">Entrada</h3>
+            <p class="text-sm text-gray-500">Recebe os dados</p>
+          </div>
+          <div class="text-2xl font-mono text-gray-400">&rarr;</div>
+          <div
+            id="layer-hidden"
+            class="text-center p-4 border-2 border-green-300 rounded-lg cursor-pointer w-full md:w-1/3 interactive-btn hover:bg-green-50"
+          >
+            <h3 class="text-xl font-bold">Oculta</h3>
+            <p class="text-sm text-gray-500">Aprende os padrões</p>
+          </div>
+          <div class="text-2xl font-mono text-gray-400">&rarr;</div>
+          <div
+            id="layer-output"
+            class="text-center p-4 border-2 border-purple-300 rounded-lg cursor-pointer w-full md:w-1/3 interactive-btn hover:bg-purple-50"
+          >
+            <h3 class="text-xl font-bold">Saída</h3>
+            <p class="text-sm text-gray-500">Produz o resultado</p>
+          </div>
+        </div>
+
+        <!-- Conteúdo Dinâmico da Camada -->
+        <div
+          id="layer-details"
+          class="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200 min-h-[200px]"
+        >
+          <p class="text-gray-500 text-center">
+            Selecione uma camada para ver os detalhes.
+          </p>
+        </div>
+
+        <div id="activation-functions" class="mt-12">
+          <h3 class="text-2xl font-bold mb-2">
+            Explorando Funções de Ativação
+          </h3>
+          <p class="text-gray-600 mb-6">
+            As funções de ativação introduzem não-linearidade, permitindo que a
+            rede aprenda relações complexas. Compare as funções mais comuns
+            clicando nos botões.
+          </p>
+          <div class="chart-container">
+            <canvas id="activationChart"></canvas>
+          </div>
+          <div class="flex justify-center space-x-2 mt-4">
+            <button
+              onclick="updateActivationChart('sigmoid')"
+              class="interactive-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              Sigmoid
+            </button>
+            <button
+              onclick="updateActivationChart('relu')"
+              class="interactive-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              ReLU
+            </button>
+            <button
+              onclick="updateActivationChart('tanh')"
+              class="interactive-btn bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              Tanh
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção 2: Processo de Treinamento -->
+      <section id="processo" class="section-card p-6 md:p-8">
+        <h2 class="text-3xl font-bold mb-2">
+          2. O Processo de Treinamento (A Fisiologia)
+        </h2>
+        <p class="text-gray-600 mb-8">
+          O treinamento busca encontrar os pesos (W) e vieses (b) ideais para
+          minimizar o erro. Este é um processo cíclico de 4 etapas. Use os
+          botões para navegar pelo ciclo de aprendizado.
+        </p>
+
+        <div
+          id="training-process"
+          class="flex items-center justify-center space-x-2 md:space-x-4 p-4 bg-gray-50 rounded-lg"
+        >
+          <div
+            id="step-1"
+            class="step-card p-3 text-center border-2 border-gray-300 rounded-lg flex-1"
+          >
+            <span class="text-sm md:text-base font-bold">1. Forward Prop</span>
+          </div>
+          <span class="font-mono text-gray-400">&rarr;</span>
+          <div
+            id="step-2"
+            class="step-card p-3 text-center border-2 border-gray-300 rounded-lg flex-1"
+          >
+            <span class="text-sm md:text-base font-bold"
+              >2. Cálculo do Erro</span
+            >
+          </div>
+          <span class="font-mono text-gray-400">&rarr;</span>
+          <div
+            id="step-3"
+            class="step-card p-3 text-center border-2 border-gray-300 rounded-lg flex-1"
+          >
+            <span class="text-sm md:text-base font-bold"
+              >3. Backpropagation</span
+            >
+          </div>
+          <span class="font-mono text-gray-400">&rarr;</span>
+          <div
+            id="step-4"
+            class="step-card p-3 text-center border-2 border-gray-300 rounded-lg flex-1"
+          >
+            <span class="text-sm md:text-base font-bold">4. Atualização</span>
+          </div>
+        </div>
+
+        <div
+          id="step-details"
+          class="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200 min-h-[150px]"
+        >
+          <!-- Conteúdo dinâmico da etapa -->
+        </div>
+        <div class="flex justify-center space-x-4 mt-6">
+          <button
+            id="prev-step"
+            class="interactive-btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            Anterior
+          </button>
+          <button
+            id="next-step"
+            class="interactive-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            Próximo
+          </button>
+        </div>
+
+        <div id="gradient-descent" class="mt-12">
+          <h3 class="text-2xl font-bold mb-2">
+            Visualizando o Gradiente Descendente
+          </h3>
+          <p class="text-gray-600 mb-6">
+            A atualização dos parâmetros usa o Gradiente Descendente para
+            "descer a colina" da função de custo e encontrar o erro mínimo.
+            Clique no botão para ver a animação.
+          </p>
+          <div class="chart-container">
+            <canvas id="gradientChart"></canvas>
+          </div>
+          <div class="flex justify-center mt-4">
+            <button
+              id="start-gradient-animation"
+              class="interactive-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              Iniciar Animação
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção 3: Fluxo Completo -->
+      <section id="fluxo-completo" class="section-card p-6 md:p-8">
+        <h2 class="text-3xl font-bold mb-2">
+          3. O Fluxo de Treinamento Completo
+        </h2>
+        <p class="text-gray-600 mb-8">
+          Finalmente, vamos juntar tudo. O treinamento envolve repetir o ciclo
+          de 4 passos para muitos lotes de dados (`batches`) ao longo de várias
+          épocas (`epochs`). Este diagrama resume o fluxo completo.
+        </p>
+        <div
+          class="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center"
+        >
+          <div class="font-mono text-gray-700">
+            <div class="p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+              <p class="font-bold text-lg">LOOP DE ÉPOCAS</p>
+              <div class="text-2xl my-2">&darr;</div>
+              <div
+                class="p-3 bg-blue-100 border border-blue-300 rounded-lg mx-4 md:mx-8"
+              >
+                <p class="font-bold">PARA CADA LOTE (BATCH)</p>
+                <div class="text-2xl my-2">&darr;</div>
+                <div
+                  class="p-3 bg-green-100 border border-green-300 rounded-lg mx-4 md:mx-8 space-y-2"
+                >
+                  <p>1. Forward Propagation</p>
+                  <p>2. Cálculo do Custo</p>
+                  <p>3. Backpropagation</p>
+                  <p>4. Atualização dos Parâmetros</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mt-6 text-gray-600">
+            Ao final deste processo, a rede terá aprendido os parâmetros ideais
+            para fazer previsões precisas em novos dados.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const layerDetails = {
+          input: {
+            title: "Camada de Entrada (Input Layer)",
+            color: "blue",
+            content: `
+                <p><strong>Função:</strong> Receber os dados brutos. Esta camada não realiza cálculos, apenas passa as características (features) do seu conjunto de dados para a primeira camada oculta.</p>
+                <p class="mt-2"><strong>Estrutura:</strong> O número de neurônios é igual ao número de características. Por exemplo, para prever o preço de um imóvel com base em 'área' e 'quartos', teríamos 2 neurônios.</p>
+                <p class="mt-2"><strong>Representação Matemática:</strong> Um vetor <strong>x</strong>, onde \\( \\mathbf{x} = [x_1, x_2, ..., x_n] \\).</p>
+            `,
+          },
+          hidden: {
+            title: "Camada Oculta (Hidden Layer)",
+            color: "green",
+            content: `
+                <p><strong>Função:</strong> O cérebro da operação. É aqui que os padrões são aprendidos através de transformações não-lineares. Pode haver várias camadas ocultas.</p>
+                <p class="mt-2"><strong>Operação de um Neurônio:</strong></p>
+                <ol class="list-decimal list-inside mt-1">
+                    <li><strong>Combinação Linear:</strong> Calcula uma soma ponderada das entradas. Fórmula: \\( z = (W \\cdot x) + b \\)</li>
+                    <li><strong>Função de Ativação:</strong> Aplica uma função não-linear. Fórmula: \\( a = \\sigma(z) \\)</li>
+                </ol>
+            `,
+          },
+          output: {
+            title: "Camada de Saída (Output Layer)",
+            color: "purple",
+            content: `
+                <p><strong>Função:</strong> Produzir o resultado final da previsão do modelo.</p>
+                <p class="mt-2"><strong>Estrutura:</strong> Varia com o problema:</p>
+                <ul class="list-disc list-inside mt-1">
+                    <li><strong>Regressão:</strong> 1 neurônio, geralmente com ativação linear.</li>
+                    <li><strong>Classificação Binária:</strong> 1 neurônio com ativação Sigmoid.</li>
+                    <li><strong>Classificação Múltipla:</strong> 1 neurônio por classe, com ativação Softmax.</li>
+                </ul>
+            `,
+          },
+        };
+
+        const detailsContainer = document.getElementById("layer-details");
+        const layerButtons = {
+          input: document.getElementById("layer-input"),
+          hidden: document.getElementById("layer-hidden"),
+          output: document.getElementById("layer-output"),
+        };
+
+        function selectLayer(layerKey) {
+          const details = layerDetails[layerKey];
+          detailsContainer.innerHTML = `
+            <h4 class="text-xl font-bold text-${details.color}-600 mb-2">${details.title}</h4>
+            <div class="text-gray-700">${details.content}</div>
+        `;
+          if (window.MathJax) {
+            window.MathJax.typesetPromise([detailsContainer]);
+          }
+          Object.values(layerButtons).forEach((btn) => {
+            btn.classList.remove(
+              "ring-2",
+              "ring-offset-2",
+              "ring-blue-400",
+              "ring-green-400",
+              "ring-purple-400"
+            );
+          });
+          layerButtons[layerKey].classList.add(
+            "ring-2",
+            "ring-offset-2",
+            `ring-${details.color}-400`
+          );
+        }
+
+        layerButtons.input.addEventListener("click", () =>
+          selectLayer("input")
+        );
+        layerButtons.hidden.addEventListener("click", () =>
+          selectLayer("hidden")
+        );
+        layerButtons.output.addEventListener("click", () =>
+          selectLayer("output")
+        );
+
+        selectLayer("input");
+
+        const activationCtx = document
+          .getElementById("activationChart")
+          .getContext("2d");
+        let activationChart;
+        const xValues = Array.from({ length: 101 }, (_, i) => (i - 50) / 10);
+        const activationData = {
+          sigmoid: xValues.map((x) => 1 / (1 + Math.exp(-x))),
+          relu: xValues.map((x) => Math.max(0, x)),
+          tanh: xValues.map((x) => Math.tanh(x)),
+        };
+
+        window.updateActivationChart = function (type) {
+          if (activationChart) {
+            activationChart.destroy();
+          }
+          const colors = {
+            sigmoid: "rgba(52, 152, 219, 1)",
+            relu: "rgba(46, 204, 113, 1)",
+            tanh: "rgba(155, 89, 182, 1)",
+          };
+          const bgColors = {
+            sigmoid: "rgba(52, 152, 219, 0.2)",
+            relu: "rgba(46, 204, 113, 0.2)",
+            tanh: "rgba(155, 89, 182, 0.2)",
+          };
+          activationChart = new Chart(activationCtx, {
+            type: "line",
+            data: {
+              labels: xValues,
+              datasets: [
+                {
+                  label: type.toUpperCase(),
+                  data: activationData[type],
+                  borderColor: colors[type],
+                  backgroundColor: bgColors[type],
+                  borderWidth: 2,
+                  fill: false,
+                  tension: 0.1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: false },
+              },
+              plugins: {
+                legend: { display: true },
+              },
+            },
+          });
+        };
+        updateActivationChart("sigmoid");
+
+        const trainingSteps = {
+          1: {
+            title: "Etapa 1: Forward Propagation",
+            content:
+              "Um dado de entrada (<strong>x</strong>) é passado pela rede, camada por camada. Cada neurônio calcula sua saída, que serve de entrada para a próxima camada. O processo continua até a camada de saída, que produz a previsão final, \\( \\hat{y} \\).",
+          },
+          2: {
+            title: "Etapa 2: Cálculo do Erro (Função de Custo)",
+            content:
+              "A previsão \\( \\hat{y} \\) é comparada com o valor real \\( y \\) usando uma <strong>Função de Custo</strong> (ex: Erro Quadrático Médio). O resultado é um número único que mede quão 'errada' foi a previsão.",
+          },
+          3: {
+            title: "Etapa 3: Backpropagation",
+            content:
+              "Este é o passo mais crucial. Usando cálculo (derivadas e a regra da cadeia), o erro é propagado <strong>para trás</strong> pela rede para determinar a contribuição de cada peso (W) e viés (b) para o erro total.",
+          },
+          4: {
+            title:
+              "Etapa 4: Atualização dos Parâmetros (Gradiente Descendente)",
+            content:
+              "Os pesos e vieses são ajustados na direção oposta ao seu gradiente de erro para reduzir o erro na próxima iteração. A fórmula é: \\( W_{novo} = W_{antigo} - \\alpha \\frac{\\partial C}{\\partial W} \\).",
+          },
+        };
+        let currentStep = 1;
+        const stepDetailsContainer = document.getElementById("step-details");
+        const stepCards = document.querySelectorAll(".step-card");
+
+        function updateTrainingStep(step) {
+          const details = trainingSteps[step];
+          stepDetailsContainer.innerHTML = `<h4 class="text-lg font-bold mb-2">${details.title}</h4><p class="text-gray-700">${details.content}</p>`;
+          if (window.MathJax) {
+            window.MathJax.typesetPromise([stepDetailsContainer]);
+          }
+          stepCards.forEach((card, index) => {
+            card.classList.remove("bg-blue-200", "border-blue-400");
+            if (index + 1 === step) {
+              card.classList.add("bg-blue-200", "border-blue-400");
+            }
+          });
+        }
+
+        document.getElementById("next-step").addEventListener("click", () => {
+          currentStep = currentStep === 4 ? 1 : currentStep + 1;
+          updateTrainingStep(currentStep);
+        });
+
+        document.getElementById("prev-step").addEventListener("click", () => {
+          currentStep = currentStep === 1 ? 4 : currentStep - 1;
+          updateTrainingStep(currentStep);
+        });
+
+        updateTrainingStep(1);
+
+        const gradientCtx = document
+          .getElementById("gradientChart")
+          .getContext("2d");
+        let gradientChart;
+        let animationFrameId;
+
+        function createGradientChart(pointX = 10) {
+          const labels = Array.from({ length: 21 }, (_, i) => i - 10);
+          const data = labels.map((x) => x * x);
+
+          if (gradientChart) {
+            gradientChart.destroy();
+          }
+
+          gradientChart = new Chart(gradientCtx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Função de Custo C",
+                  data: data,
+                  borderColor: "rgba(230, 126, 34, 1)",
+                  backgroundColor: "rgba(230, 126, 34, 0.2)",
+                  fill: false,
+                  tension: 0.1,
+                },
+                {
+                  label: "Parâmetro Atual",
+                  data: [{ x: pointX, y: pointX * pointX }],
+                  pointBackgroundColor: "rgba(52, 152, 219, 1)",
+                  pointRadius: 8,
+                  pointHoverRadius: 10,
+                  type: "scatter",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  type: "linear",
+                  position: "bottom",
+                },
+              },
+            },
+          });
+        }
+
+        document
+          .getElementById("start-gradient-animation")
+          .addEventListener("click", () => {
+            if (animationFrameId) {
+              cancelAnimationFrame(animationFrameId);
+            }
+
+            let pointX = 10;
+            const learningRate = 0.1;
+
+            function animate() {
+              pointX = pointX - learningRate * (2 * pointX);
+              createGradientChart(pointX);
+
+              if (Math.abs(pointX) > 0.01) {
+                animationFrameId = requestAnimationFrame(animate);
+              }
+            }
+            animate();
+          });
+
+        createGradientChart();
+
+        const sections = document.querySelectorAll("main section[id]");
+        const navLinks = document.querySelectorAll("#navbar a");
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                navLinks.forEach((link) => {
+                  link.classList.remove("active");
+                  if (
+                    link.getAttribute("href").substring(1) === entry.target.id
+                  ) {
+                    link.classList.add("active");
+                  }
+                });
+              }
+            });
+          },
+          { rootMargin: "-50% 0px -50% 0px" }
+        );
+
+        sections.forEach((section) => {
+          observer.observe(section);
+        });
+      });
+    </script>
+  </body>
+</html>
