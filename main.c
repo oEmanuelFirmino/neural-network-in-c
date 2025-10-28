@@ -4,7 +4,7 @@
 #include <time.h>
 
 // Auxiliaries functions
-double randowm_weigth()
+double randowm_weight()
 {
   return ((double)rand() / RAND_MAX) - 0.5;
 }
@@ -87,7 +87,7 @@ NeuralNetwork *create_network(int num_of_layers, int neurons_by_layer[], double 
 
         for (int k = 0; k < num_inputs_for_neuron; k++)
         {
-          neuron->weigth[k] = randowm_weigth();
+          neuron->weigth[k] = randowm_weight();
         }
       }
       else
