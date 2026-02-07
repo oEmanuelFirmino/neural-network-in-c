@@ -4,7 +4,7 @@
 #include <time.h>
 
 // Auxiliaries functions
-double randowm_weigth() {
+double randowm_weight() {
   return ((double)rand() / RAND_MAX) - 0.5;
 }
 

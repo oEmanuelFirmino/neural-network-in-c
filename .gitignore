@@ -1,2 +1,8 @@
+*~
+.DS_Store
+
 /.vscode
 /main.exe
+
+neural_network.dSYM
+neural_network
